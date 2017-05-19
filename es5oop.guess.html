@@ -13,14 +13,33 @@
   <button id="submit">guess!</button>
 </body>
   <script defer>
-      var guessingGame = new App();
 
+      function View (submitHandler){
+          this.button = $("#submit");
+          this.input = $("#num");
+          this.display = $("#result");
+          this.submitHandler = submitHandler;
+          this.button.on('click',this.submitGuess.bind(this));
+      }
+      View.prototype.submitGuess = function (){
+          var chosenNumber = parseInt(this.input.val());
+          console.log(chosenNumber + ' in submit guess');
+          this.submitHandler(chosenNumber);
+      };
+      View.prototype.displayResult = function (message) {
+          this.display.text(message);
+      }
+      function Model () {
+          this.secretNumber = Math.floor(Math.random()*10)+1;
+          this.getNumber = function (){
+              return this.secretNumber;
+          }
+      }
       function App () {
           this.model = new Model();
-          this.view = new View(function (number){
-              guessingGame.handleSubmit(number);
-          });
-          this.handleSubmit = function (chosenNumber){
+          this.view = new View(this.handleSubmit.bind(this));
+      }
+      App.prototype.handleSubmit = function (chosenNumber){
               var secretNumber = this.model.getNumber();
               var text = '';
               console.log(secretNumber, chosenNumber);
@@ -34,30 +53,10 @@
                   text = 'Invalid input!';
               }
               this.view.displayResult(text);
-          }
-      }
-      function View (submitHandler){
-          this.button = $("#submit");
-          this.input = $("#num");
-          this.display = $("#result");
-          this.submitHandler = submitHandler;
-          this.submitGuess = function (){
-              var chosenNumber = parseInt(this.input.val());
-              console.log(chosenNumber + ' in submit guess');
-              this.submitHandler(chosenNumber);
-          };
-          this.button.on('click',this.submitGuess.bind(this));
-          this.displayResult = function (message){
-              this.display.text(message);
-          }
+      };
 
-      }
-      function Model () {
-          this.secretNumber = Math.floor(Math.random()*10)+1;
-          this.getNumber = function (){
-              return this.secretNumber;
-          }
-      }
+
+      var guessingGame = new App();
 
 
   </script>
